@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Availability Calendar · JustWashes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="onboarding.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #EEF1F5; font-family: 'Inter', sans-serif; color: var(--jw-text); min-height: 100vh; }
+  .avail-standalone {
+    max-width: 1200px; margin: 0 auto; padding: 40px 28px 56px;
+  }
+  .avail-standalone-hdr {
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 24px;
+    padding-bottom: 22px; margin-bottom: 26px;
+    border-bottom: 1px solid var(--jw-border);
+  }
+  .avail-standalone h1 {
+    font-size: 30px; font-weight: 800; letter-spacing: -0.6px;
+    margin: 0 0 6px; color: var(--jw-text);
+  }
+  .avail-standalone .lede {
+    font-size: 14px; color: var(--jw-text-muted); max-width: 540px; line-height: 1.5; margin: 0;
+  }
+  .avail-phase-tabs {
+    display: flex; gap: 4px; margin-bottom: 20px;
+    border-bottom: 1px solid var(--jw-border);
+  }
+  .avail-phase-tab {
+    background: transparent; border: none; padding: 11px 18px;
+    font-weight: 700; font-size: 13.5px; font-family: inherit;
+    color: var(--jw-text-muted); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 7px;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+  }
+  .avail-phase-tab.active { color: var(--jw-cyan-strong); border-bottom-color: var(--jw-cyan); }
+  .avail-brand {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 12.5px; font-weight: 700; letter-spacing: 0.3px;
+    text-transform: uppercase; color: var(--jw-text-subtle);
+  }
+  .avail-brand-mark {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--jw-cyan) 0%, #0B2545 100%);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: white; font-weight: 800; font-size: 13px; letter-spacing: -0.5px;
+  }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="availability-calendar.jsx"></script>
+
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+function StandaloneApp() {
+  const { defaultWeekly, hoursForRanges } = window.availHelpers;
+
+  const [value, setValue] = React.useState(() => ({
+    phase: 'defaults',
+    weekly: defaultWeekly(),
+    overrides: {},
+    selectedDate: null,
+  }));
+
+  const weeklyHours = Object.values(value.weekly).reduce((s, d) => s + (d.active ? hoursForRanges(d.ranges) : 0), 0);
+  const activeDays = Object.values(value.weekly).filter(d => d.active).length;
+  const overrideCount = Object.keys(value.overrides).length;
+
+  return (
+    <div className="avail-standalone">
+      <header className="avail-standalone-hdr">
+        <div>
+          <div className="avail-brand" style={{ marginBottom: 14 }}>
+            <span className="avail-brand-mark">JW</span>
+            JustWashes · Availability
+          </div>
+          <h1>Set your working hours</h1>
+          <p className="lede">Start with your default week, then open the calendar to adjust specific days — extra blocks, shorter hours, or taking the day off.</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+          <Chip tone="cyan">{activeDays} days / wk</Chip>
+          <Chip tone="orange">{weeklyHours.toFixed(1)}h / wk</Chip>
+          {overrideCount > 0 && <Chip tone="purple">{overrideCount} custom day{overrideCount !== 1 ? 's' : ''}</Chip>}
+        </div>
+      </header>
+
+      <div className="avail-phase-tabs">
+        {[
+          { k: 'defaults', label: 'Weekly defaults', icon: 'gear' },
+          { k: 'calendar', label: 'Month calendar', icon: 'calendar' },
+        ].map(t => (
+          <button key={t.k}
+            className={`avail-phase-tab ${value.phase === t.k ? 'active' : ''}`}
+            onClick={() => setValue({ ...value, phase: t.k, selectedDate: null })}>
+            <Icon name={t.icon} size={13}/> {t.label}
+          </button>
+        ))}
+      </div>
+
+      <AvailabilityCalendar
+        value={value}
+        onChange={setValue}
+        year={2026}
+        month={3}
+        today={new Date(2026, 3, 24)}
+      />
+    </div>
+  );
+}
+
+function mount() {
+  const el = document.getElementById('root');
+  if (el && !el.__mounted) {
+    el.__mounted = true;
+    ReactDOM.createRoot(el).render(<StandaloneApp/>);
+  } else if (!el) {
+    requestAnimationFrame(mount);
+  }
+}
+mount();
+</script>
+
+</body>
+</html>

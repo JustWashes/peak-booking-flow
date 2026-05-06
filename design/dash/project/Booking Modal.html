@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>JustWashes · Booking Modal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #EEF1F5; font-family: 'Inter', sans-serif; }
+  .dc-artboard-inner { background: #1B2E4B; }
+</style>
+</head>
+<body>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="booking-modal.jsx"></script>
+
+<div id="canvas-root"></div>
+
+<script type="text/babel" data-presets="react">
+function CanvasApp() {
+  const DC = window.DesignCanvas, S = window.DCSection, A = window.DCArtboard;
+  return (
+    <DC
+      title="Booking Modal — Date & Time"
+      subtitle="Three explorations of the time-slot picker. 30-min slots fit cleanly in a 4-col grid; 15-min density gets 2× the bubbles, so each variant solves the count differently. Toggle the 30/15 chip in any modal to compare in place."
+    >
+      <S id="thirty" title="30-minute increments" description="Default density. 17 slots, 4-col grid, all bubbles visible without scrolling. The clean baseline.">
+        <A id="thirty-modal" label="30-min · grid (1100 × 820)" width={1100} height={820}>
+          <div data-screen-label="30-min Modal" style={{ width: '100%', height: '100%' }}>
+            {React.createElement(window.Modal30)}
+          </div>
+        </A>
+      </S>
+
+      <S id="fifteen" title="15-minute increments — three takes" description="33 slots is too many for a flat grid. Each variant respects the bubble count differently: group, collapse-and-expand, or scroll.">
+        <A id="fifteen-grouped" label="A · Morning / Afternoon groups (1100 × 900)" width={1100} height={900}>
+          <div data-screen-label="15-min Grouped" style={{ width: '100%', height: '100%' }}>
+            {React.createElement(window.Modal15Grouped)}
+          </div>
+        </A>
+        <A id="fifteen-collapsed" label="B · Hour anchors, expand to 15-min (1100 × 820)" width={1100} height={820}>
+          <div data-screen-label="15-min Collapsed" style={{ width: '100%', height: '100%' }}>
+            {React.createElement(window.Modal15Collapsed)}
+          </div>
+        </A>
+        <A id="fifteen-column" label="C · Scrolling column (1100 × 820)" width={1100} height={820}>
+          <div data-screen-label="15-min Column" style={{ width: '100%', height: '100%' }}>
+            {React.createElement(window.Modal15Column)}
+          </div>
+        </A>
+      </S>
+
+      <S id="overlap" title="Overlap state" description="Same modal as the 30-min default, with the overlap warning surfaced — matches the warning pattern in the reference screenshot.">
+        <A id="overlap-modal" label="Overlap warning (1100 × 880)" width={1100} height={880}>
+          <div data-screen-label="Overlap Warning" style={{ width: '100%', height: '100%' }}>
+            {React.createElement(window.ModalOverlap)}
+          </div>
+        </A>
+      </S>
+    </DC>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('canvas-root')).render(<CanvasApp />);
+</script>
+
+</body>
+</html>
